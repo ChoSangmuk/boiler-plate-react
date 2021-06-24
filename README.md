@@ -82,14 +82,7 @@ npm start
 - src/index.js : App.js 컴포넌트가 들어감
 ```js
 // src/index.js
-ReactDOM.render(
-  <React.StrictMode>
-    <Provider>
-      <App />
-    </Provider>
-  </React.StrictMode>,
-  document.getElementById('root')
-);
+ReactDOM.render(<App />, document.getElementById('root'));
 ```
 - public/index.html : root div 태그를 가짐
 ```html
@@ -380,6 +373,8 @@ dispatch -> action -> reducer -> state
 ```
 
 ## 31장 회원 가입 페이지
+- 로그인 페이지와 유사
+
 ## 32장 로그아웃
 ## 33장 인증 체크 (1)
 ## 34장 인증 체크 (2) 강의 마무리
