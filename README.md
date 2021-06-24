@@ -19,6 +19,19 @@ docker commit -m "node, npm installed" heuristic_panini node_basic:0.1
 docker run -p 3000:3000 -p 5000:5000 -v /Users/chosangmuk/Documents:/workspace -it node_basic:0.1
 ```
 
+## 실행 방법 (로컬)
+1. React.js Front-End 실행
+```sh
+# Shell
+# root directory에서 종속성 다운로드
+npm install
+
+# React.js 실행
+npm run start
+# or
+npm start
+```
+
 ## 15장 리액트란 ?
 - [React](https://reactjs.org/) : UI를 구축하기위한 선언적이고 효율적이며 유연한 JavaScript 라이브러리
 - made by facebook, and not a framework
@@ -102,8 +115,67 @@ hoc : higher Order Component, 다른 컴포넌트를 인자로 가지는 함수
 utils : 이것저것
 ```
 
+## 20장 React Router Dom
+- 페이지 이동시 React Router Dom을 사용, [참고](https://reactrouter.com/web/example/basic)
+```sh
+# Shell
+npm install react-router-dom --save
+```
+- app.js에서 라우팅
+```js
+//App.js
+import React from 'react'
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route,
+  Link
+} from "react-router-dom";
+
+import LandingPage from './components/views/LandingPage/LandingPage'
+import LoginPage from './components/views/LoginPage/LoginPage'
+import RegisterPage from './components/views/RegisterPage/RegisterPage'
+
+function App() {
+  return (
+    <div>
+      <Router>
+        <div>
+          {/*
+            A <Switch> looks through all its children <Route>
+            elements and renders the first one whose path
+            matches the current URL. Use a <Switch> any time
+            you have multiple routes, but you want only one
+            of them to render at a time
+          */}
+          <Switch>
+            <Route exact path="/" component={LandingPage} />
+            <Route exact path="/login" component={LoginPage} />
+            <Route exact path="/register" component={RegisterPage} />
+          </Switch>
+        </div>
+      </Router>
+    </div>
+  )
+}
+
+export default App;
+```
+- 읽을거리
+1. exact 사용해야하는 이유?
+```
+<Route path="/users" component={Users} />
+<Route path="/users/create" component={CreateUser} />
+
+exact이 없다면 http://app.com/users 여기로 갔을때 Users 컴포넌트로 가는데 
+http://app.com/users/create 여기로 갔을때도 Users 컴포넌트로 갑니다.
+
+Router가 부분적으로만 닮아도 같은거라고 인식해버려서 처음 보는 Route의 컴포넌트로 이동시켜버려서 입니다.
+그래서 부분적인 것만 닮아도 같은거라고 인식하는 부분을 없애기 위해서 exact를 넣어주는 것입니다.
+``` 
+
 ## 21장 데이터 Flow & Axios
-- [Axios](https://www.npmjs.com/package/axios) : React에서 Back-End에 API를 연동하기 위해 사용 
+- [Axios](https://www.npmjs.com/package/axios) : React에서 Back-End에 API를 연동하기 위해 사용
 ```sh
 # Shell
 npm install axios --save
@@ -128,8 +200,7 @@ module.exports = function(app) {
   );
 };
 ```
-
-- 강의 댓글 참고
+- 읽을거리
 1. 추가 패키지 미설치, Front-End 설정
 ```json
 // package.json
@@ -172,8 +243,13 @@ npm install concurrently --save
 ```json
 // package.json
 "scripts": {
-  "full": "concurrently \"npm run start --prefix boiler-plate-nodejs\" \"npm run start --prefix boiler-plate-react\"",
+  "nodejs-react": "concurrently \"npm run start --prefix boiler-plate-nodejs\" \"npm run start --prefix boiler-plate-react\"",
 },	
+```
+- 상위 폴더에서 실행
+```sh
+# Shell
+npm run nodejs-react
 ```
 
 ## 25장 Antd CSS Framwork
@@ -191,3 +267,119 @@ npm install -g gulp
 npm install materialize-css@next
 npm install antd --save
 ```
+
+## 26장 Redux 기초
+- [Redux](https://ko.redux.js.org/introduction/getting-started/) : JS App을 위한 예측 가능한 state 컨테이너
+- state 관리 라이브러리 - 컴포넌트들의 공동DB(Redux Store) 
+- props
+  - properties
+  - 컴포넌트 간 대화에 사용 
+  - 부모 -> 자식 전달만 가능
+  - 자식 안에서 변경 불가(immutable), 부모에서 다시 내려줘야함
+  - 컴포넌트의 (HTML)속성으로 전달
+- state
+  - 컴포넌트 안에서 데이터 교환 및 전달
+  - 수정 가능 mutable
+  - 변경 시, re render
+- redux는 단방향 순환 flow
+```
+component --dispatch--> action -> reducer -> store -> component
+```
+- action(Object 형식) : 무슨 일이 일어났는지 설명
+```js
+{ type : "LIKE_ARTICLE", articleId:42 } // 42번 기사에 좋아요가 눌림
+{ type : "ADD_TODO", text:"read the redux docs." } // "read the redux docs." 라는 텍스트가 TODO에 추가됨
+```
+- reducer(pure function 형식) :  변경 사항을 설명하고 next state를 리턴
+```js
+(previousState, action) => nextState
+```
+- store : 일종 state의 DB이며 메소드가 존재
+
+## 27장 Redux UP !!!!!
+- Redux 설치
+```sh
+# Shell
+npm install redux react-redux redux-promise redux-thunk --save
+```
+- redux와 redux hook의 차이
+- promise, thunk는 미들웨어, 보조 도구
+  - 두 가지 보조 도구가 없으면 redux store는 객체 형식의 action만 받을 수 있음
+  - 두 가지 보조 도구를 통해 promise, function을 넘길 수 있음
+  - 조금 더 정확히는 dispatch가 promise(promise), function(thunk)를 어떻게 받는지 알려줌
+- app과 리덕스를 연결해줘야함(소스 참고)
+```js
+// index.js
+// ...
+import { Provider } from 'react-redux';// redux에서 제공하는 Provider를 이용해서 App에 연결
+import { applyMiddleware, createStore } from 'redux';
+import promiseMiddleware from 'redux-promise';
+import ReduxThunk from 'redux-thunk';
+import Reducer from './_reducer'; // index.js가 생략됨
+
+// 원래는 createStore만 사용하여 store 생성 -> 객체 이외에는 받을 수 없음
+// promise와 function도 받을 수 있게끔 promiseMiddleware, ReduxThunk 와 함께 만들어줌
+const createStoreWithMiddleware = applyMiddleware(promiseMiddleware, ReduxThunk)(createStore)
+
+ReactDOM.render(
+  <React.StrictMode>
+    <Provider store={createStoreWithMiddleware(Reducer,
+      // redux extension : Chrome에서 extension을 사용하기 위함
+      window.__REDUX_DEVTOOLS_EXTENSION__ &&
+      window.__REDUX_DEVTOOLS_EXTENSION__()
+    )}>
+      <App />
+    </Provider>
+  </React.StrictMode>,
+  document.getElementById('root')
+);
+// ...
+
+// _reducer/index.js
+import { combineReducers } from 'redux';// 여러 Reducer를 하나로 합쳐줌
+import user from './user_reducer';
+//import commment from './commment_reducer';// 생성될 수도 있는 Reducer
+
+const rootReducer = combineReducers({
+  user
+})
+
+export default rootReducer;
+```
+- reducer 구현은 기능을 구현하면서 천천히 ...
+- 읽을거리
+```
+Redux는 state를 더욱 쉽게 관리할 수 있게 도와주는 역할을 합니다. 써도되고 안써도 됩니다. 
+Redux를 쓰면 성능 부분에서 느려지기 때문에 쓸 곳과 안 쓸 곳을 잘 가려서 쓰는게 중요합니다.
+
+우선 state은 그 현재 해당하는 페이지에서 어떠한 값들을 보여줘야 되잖아요  
+유저 정보를 나타내줘야 하는 페이지면 유저 이름, 유저 출신, 유저 아이디, 이메일 등등이 다 state이  됩니다.
+하지만 유저가 이 정보들을 바꿔주고 싶다면 이 state을 바꿔주어서 해당 페이지에서 보여주는것도 바뀌게 됩니다.
+이게 부모 컴포넌트에서 전달되는 정보라면 props이 되고 하지만 props는 그 해당 컴포넌트에서는 바꿀 수가 없습니다.
+하지만 state은 해당 컴포넌트안에서 값이 변화가 될 수 있습니다.
+```
+
+## 28장 React Hooks
+- React vs React Hooks
+- class Component vs functional Component
+- react Components는 두 가지 방식으로 구현될 수 있음
+  - class Component : 복잡, 다양, 느려짐
+  - functional Component : 한정적, 간결, 빨라짐, 단순, LifeCycle 함수를 사용할 수 없었음
+- React Hooks 발표 이후, 복잡한 기능도 functional Component 에서 사용 가능
+- [React LifeCycle](https://ko.reactjs.org/docs/react-component.html)
+
+## 29장 로그인 페이지 (1)
+## 30장 로그인 페이지 (2)
+- Formik, yup 라이브러리로 다이나믹하게 효과를 줄 수 있음(but 이 강의에서는 진행하지 않음)
+- Redux를 사용하여 로그인 페이지에 작성
+- 입력 데이터를 서버로 보내고 응답받기
+```
+html value에 state를 매칭시켜줌
+onChange 메소드 실행 -> state 변경 -> value 변경 
+dispatch -> action -> reducer -> state
+```
+
+## 31장 회원 가입 페이지
+## 32장 로그아웃
+## 33장 인증 체크 (1)
+## 34장 인증 체크 (2) 강의 마무리
