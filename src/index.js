@@ -4,7 +4,7 @@ import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 import 'antd/dist/antd.css';
-import { Provider } from 'react-redux';// redux에서 제공하는 Provider를 이용해서 App에 연결
+import { Provider } from 'react-redux';// redux에서 제공하는 Provider를 이용해서 App에 연결, 안에 store를 설정해 주어야함
 import { applyMiddleware, createStore } from 'redux';
 import promiseMiddleware from 'redux-promise';
 import ReduxThunk from 'redux-thunk';

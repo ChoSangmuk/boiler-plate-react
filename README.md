@@ -276,18 +276,18 @@ npm install antd --save
   - 변경 시, re render
 - redux는 단방향 순환 flow
 ```
-component --dispatch--> action -> reducer -> store -> component
+component --dispatch--> action -> reducer -> store --subscribe--> component
 ```
 - action(Object 형식) : 무슨 일이 일어났는지 설명
 ```js
 { type : "LIKE_ARTICLE", articleId:42 } // 42번 기사에 좋아요가 눌림
 { type : "ADD_TODO", text:"read the redux docs." } // "read the redux docs." 라는 텍스트가 TODO에 추가됨
 ```
-- reducer(pure function 형식) :  변경 사항을 설명하고 next state를 리턴
+- reducer(pure function 형식) : action을 진행함으로 해서 일어나는 변경 사항을 설명하고 next state를 리턴
 ```js
 (previousState, action) => nextState
 ```
-- store : 일종 state의 DB이며 메소드가 존재
+- store : 일종 state의 DB이며 메소드가 존재하며, 그를 통해 state를 관리할 수 있음
 
 ## 27장 Redux UP !!!!!
 - Redux 설치
@@ -304,7 +304,7 @@ npm install redux react-redux redux-promise redux-thunk --save
 ```js
 // index.js
 // ...
-import { Provider } from 'react-redux';// redux에서 제공하는 Provider를 이용해서 App에 연결
+import { Provider } from 'react-redux';// redux에서 제공하는 Provider를 이용해서 App에 연결, 안에 store를 설정해 주어야함
 import { applyMiddleware, createStore } from 'redux';
 import promiseMiddleware from 'redux-promise';
 import ReduxThunk from 'redux-thunk';
@@ -346,10 +346,10 @@ Redux는 state를 더욱 쉽게 관리할 수 있게 도와주는 역할을 합�
 Redux를 쓰면 성능 부분에서 느려지기 때문에 쓸 곳과 안 쓸 곳을 잘 가려서 쓰는게 중요합니다.
 
 우선 state은 그 현재 해당하는 페이지에서 어떠한 값들을 보여줘야 되잖아요  
-유저 정보를 나타내줘야 하는 페이지면 유저 이름, 유저 출신, 유저 아이디, 이메일 등등이 다 state이  됩니다.
-하지만 유저가 이 정보들을 바꿔주고 싶다면 이 state을 바꿔주어서 해당 페이지에서 보여주는것도 바뀌게 됩니다.
+유저 정보를 나타내줘야 하는 페이지면 유저 이름, 유저 출신, 유저 아이디, 이메일 등등이 다 state이 됩니다.
+하지만 유저가 이 정보들을 바꿔주고 싶다면 이 state을 바꿔주어서 해당 페이지에서 보여주는 것도 바뀌게 됩니다.
 이게 부모 컴포넌트에서 전달되는 정보라면 props이 되고 하지만 props는 그 해당 컴포넌트에서는 바꿀 수가 없습니다.
-하지만 state은 해당 컴포넌트안에서 값이 변화가 될 수 있습니다.
+하지만 state은 해당 컴포넌트 안에서 값이 변화가 될 수 있습니다.
 ```
 
 ## 28장 React Hooks
@@ -358,7 +358,72 @@ Redux를 쓰면 성능 부분에서 느려지기 때문에 쓸 곳과 안 쓸 �
 - react Components는 두 가지 방식으로 구현될 수 있음
   - class Component : 복잡, 다양, 느려짐
   - functional Component : 한정적, 간결, 빨라짐, 단순, LifeCycle 함수를 사용할 수 없었음
+```js
+// Class Component
+import React, { Component } from 'react'
+
+export default class Hello extends Component{
+  render() {
+    return (
+      <div> Hello! </div>
+    );
+  }
+}
+
+// Functional Component
+import React from 'react'
+
+export default function Hello(){
+  return (
+      <div> Hello! </div>
+  )
+}
+```
 - React Hooks 발표 이후, 복잡한 기능도 functional Component 에서 사용 가능
+```js
+// Class Component
+import React, { Component } from 'react'
+import Axios from 'axios'
+
+export default class Hello extends Component{
+  constructor(props){
+    super(props);
+    this.state = { name: "" }; 
+  }
+
+  componentDidMount() {
+    Axios.get('/api/user/name')
+      .then(response => {
+        this.setState({ name: response.data.name })
+      })
+  }
+
+  render() {
+    return (
+      <div> Hello! {this.state.name}</div>
+    );
+  }
+}
+
+// Functional Component
+import React, {useEffect, useState} from 'react'
+import Axios from 'axios'
+
+export default function Hello(){
+  const [Name, setName] = useState("")
+  
+  useEffect(() => {
+    Axios.get('/api/user/name')
+      .then(response => {
+        setName(response.data.name)
+      })
+  }, [])
+
+  return (
+    <div> Hello! {Name}</div>
+  )
+}
+```
 - [React LifeCycle](https://ko.reactjs.org/docs/react-component.html)
 
 ## 29장 로그인 페이지 (1)
