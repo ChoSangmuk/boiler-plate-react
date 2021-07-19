@@ -19,10 +19,12 @@ function LandingPage(props) {
 
   return (
     <div>
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', height: '100vh' }}>
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', height: '70vh' }}>
         <h2>Welcome To Boiler Plate</h2>
       </div>
-      <button onClick={onClickHandler}>Logout</button>
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', height: '30vh' }}>
+        <button onClick={onClickHandler}>Logout</button>
+      </div>
     </div>
   )
 }
