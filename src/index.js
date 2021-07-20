@@ -17,7 +17,7 @@ const createStoreWithMiddleware = applyMiddleware(promiseMiddleware, ReduxThunk)
 ReactDOM.render(
   <React.StrictMode>
     <Provider store={createStoreWithMiddleware(Reducer,
-      // redux extension : Chrome에서 extension을 사용하기 위함
+      // Chrome에서 extension을 사용하기 위함
       window.__REDUX_DEVTOOLS_EXTENSION__ &&
       window.__REDUX_DEVTOOLS_EXTENSION__()
     )}>

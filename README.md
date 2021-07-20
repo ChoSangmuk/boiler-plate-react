@@ -79,9 +79,9 @@ npm start
 ## 18장 구조 설명
 - Webpack : src 폴더만 관리, public은 관리하지 않음, 따라서 src 폴더에 이미지 등을 넣음
 - src/App.js : 랜더링 되어 나오게 제일 메인 화면, 컴포넌트
-- src/index.js : App.js 컴포넌트가 들어감
+- src/index.js : ReactDOM.render를 통해 index.html의 root태그를 App 컴포넌트로 변경함
 ```js
-// src/index.js
+// src/index.js ...
 ReactDOM.render(<App />, document.getElementById('root'));
 ```
 - public/index.html : root div 태그를 가짐
@@ -93,8 +93,8 @@ ReactDOM.render(<App />, document.getElementById('root'));
 ## 19장 CRA to Our Boilerplate
 - Create React App 기본 구조를 Boiler plate에 맞게 구조 변경
 ```
-_actions : redux를 위한 폴더
-_reducer : redux를 위한 폴더
+_actions : Redux를 위한 폴더
+_reducer : Redux를 위한 폴더
 components
   views
     Footer : 페이지 하단
@@ -102,69 +102,36 @@ components
     LoginPage : 로그인 페이지
     NavBar : 상단 메뉴 혹은 메뉴바
     RegisterPage : 등록 페이지
-App.js : 라우팅 관련된 일을 처리
+App.js : Routing 관련된 일을 처리
 Config.js : 환경변수 
 hoc : higher Order Component, 다른 컴포넌트를 인자로 가지는 함수
 utils : 이것저것
 ```
 
 ## 20장 React Router Dom
-- 페이지 이동시 React Router Dom을 사용, [참고](https://reactrouter.com/web/example/basic)
+- React에선 페이지 이동시 React Router Dom을 사용함 
+- [React Router Dom 공식 예제](https://reactrouter.com/web/example/basic)
+- [React Router DOM 학습 이력](https://github.com/ChoSangmuk/react-router-dom-example)
 ```sh
 # Shell
+# React Router DOM 설치
 npm install react-router-dom --save
 ```
-- app.js에서 라우팅
-```js
-//App.js
-import React from 'react'
-import {
-  BrowserRouter as Router,
-  Switch,
-  Route,
-  Link
-} from "react-router-dom";
-
-import LandingPage from './components/views/LandingPage/LandingPage'
-import LoginPage from './components/views/LoginPage/LoginPage'
-import RegisterPage from './components/views/RegisterPage/RegisterPage'
-
-function App() {
-  return (
-    <div>
-      <Router>
-        <div>
-          {/*
-            A <Switch> looks through all its children <Route>
-            elements and renders the first one whose path
-            matches the current URL. Use a <Switch> any time
-            you have multiple routes, but you want only one
-            of them to render at a time
-          */}
-          <Switch>
-            <Route exact path="/" component={LandingPage} />
-            <Route exact path="/login" component={LoginPage} />
-            <Route exact path="/register" component={RegisterPage} />
-          </Switch>
-        </div>
-      </Router>
-    </div>
-  )
-}
-
-export default App;
-```
+- app.js에서 Routing 구현
+- 파일로 분리된 컴포넌트 가져오기
+- [소스코드(App.js) 참고](/src/App.js)
 - 읽을거리
 1. exact 사용해야하는 이유?
-```
+```html
 <Route path="/users" component={Users} />
 <Route path="/users/create" component={CreateUser} />
+```
+```
+exact이 없다면 http://app.com/users URL을 입력했을 때 Users 컴포넌트 실행
+http://app.com/users/create URL을 입력했을 때도 Users 컴포넌트로 감
 
-exact이 없다면 http://app.com/users 여기로 갔을때 Users 컴포넌트로 가는데 
-http://app.com/users/create 여기로 갔을때도 Users 컴포넌트로 갑니다.
-
-Router가 부분적으로만 닮아도 같은거라고 인식해버려서 처음 보는 Route의 컴포넌트로 이동시켜버려서 입니다.
-그래서 부분적인 것만 닮아도 같은거라고 인식하는 부분을 없애기 위해서 exact를 넣어주는 것입니다.
+Router가 부분적으로만 닮아도 같은 것이라고 인식, 처음 보는 Route의 컴포넌트로 이동시켜 버림
+이를 막기 위해 정확히 일치하는 경우에만 컴포넌트가 실행되게끔 exact를 넣어줌
 ``` 
 
 ## 21장 데이터 Flow & Axios
@@ -173,26 +140,42 @@ Router가 부분적으로만 닮아도 같은거라고 인식해버려서 처음
 # Shell
 npm install axios --save
 ```
+- 임의로 Back-End에 request 보내보기
+```js
+// components/views/LandingPage/LandingPage.js
+import React, { useEffect } from 'react'
+import axios from 'axios'
+
+function LandingPage(props) {
+
+  useEffect(() => {
+    axios.get('/api/hello')
+      .then(response => { console.log(response.data) })
+  }, [])
+
+  return (
+    <div>
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', height: '70vh' }}>
+        <h2>Welcome To Boiler Plate</h2>
+      </div>
+    </div>
+  )
+}
+
+export default LandingPage
+```
+- Back-End 서버와 Front-End 애플리케이션 간의 CORS policy 문제로 연결이 불가능
 
 ## 22장 CORS 이슈, Proxy 설정
-- CROS 문제로 바로 데이터 전송은 불가능
-- Front-End에 http-proxy-middleware 사용하여 해결
+- CROS policy 문제로 바로 데이터 전송은 불가능
+- 여러가지 방법이 있지만, 강의에서는 Front-End에 http-proxy-middleware 사용하여 해결
 ```sh
 # Shell
+# http-proxy-middleware 설치
 npm install http-proxy-middleware --save
 ```
 - src/setupProxy.js 생성
-```js
-// src/setupProxy.js
-const { createProxyMiddleware } = require('http-proxy-middleware');
-module.exports = function(app) {
-  app.use( '/api', createProxyMiddleware({
-      target: 'http://localhost:5000',
-      changeOrigin: true,
-    })
-  );
-};
-```
+- [소스코드(setupProxy.js) 참고](/src/setupProxy.js)
 - 읽을거리
 1. 추가 패키지 미설치, Front-End 설정
 ```json
@@ -220,7 +203,9 @@ app.use(
 ```
 
 ## 23장 Proxy Server ?
-- 프록시 서버의 목적 [참고 1](https://j2enty.tistory.com/entry/IT-Proxy-Server), [참고 2](https://dany-it.tistory.com/107)
+- 프록시 서버의 목적 
+  - [참고 1](https://j2enty.tistory.com/entry/IT-Proxy-Server)
+  - [참고 2](https://dany-it.tistory.com/107)
 
 ## 24장 Concurrently
 - Back-End, Front-End 동시에 작동시키기
@@ -274,7 +259,7 @@ npm install antd --save
   - 컴포넌트 안에서 데이터 교환 및 전달
   - 수정 가능 mutable
   - 변경 시, re render
-- redux는 단방향 순환 flow
+- Redux는 단방향 순환 flow
 ```
 component --dispatch--> action -> reducer -> store --subscribe--> component
 ```
@@ -290,74 +275,32 @@ component --dispatch--> action -> reducer -> store --subscribe--> component
 - store : 일종 state의 DB이며 메소드가 존재하며, 그를 통해 state를 관리할 수 있음
 
 ## 27장 Redux UP !!!!!
-- Redux 설치
+- Redux를 Front-End 애플리케이션에 설치
 ```sh
 # Shell
 npm install redux react-redux redux-promise redux-thunk --save
 ```
-- redux와 redux hook의 차이
 - promise, thunk는 미들웨어, 보조 도구
   - 두 가지 보조 도구가 없으면 redux store는 객체 형식의 action만 받을 수 있음
   - 두 가지 보조 도구를 통해 promise, function을 넘길 수 있음
   - 조금 더 정확히는 dispatch가 promise(promise), function(thunk)를 어떻게 받는지 알려줌
 - app과 리덕스를 연결해줘야함(소스 참고)
-```js
-// index.js
-// ...
-import { Provider } from 'react-redux';// redux에서 제공하는 Provider를 이용해서 App에 연결, 안에 store를 설정해 주어야함
-import { applyMiddleware, createStore } from 'redux';
-import promiseMiddleware from 'redux-promise';
-import ReduxThunk from 'redux-thunk';
-import Reducer from './_reducer'; // index.js가 생략됨
-
-// 원래는 createStore만 사용하여 store 생성 -> 객체 이외에는 받을 수 없음
-// promise와 function도 받을 수 있게끔 promiseMiddleware, ReduxThunk 와 함께 만들어줌
-const createStoreWithMiddleware = applyMiddleware(promiseMiddleware, ReduxThunk)(createStore)
-
-ReactDOM.render(
-  <React.StrictMode>
-    <Provider store={createStoreWithMiddleware(Reducer,
-      // redux extension : Chrome에서 extension을 사용하기 위함
-      window.__REDUX_DEVTOOLS_EXTENSION__ &&
-      window.__REDUX_DEVTOOLS_EXTENSION__()
-    )}>
-      <App />
-    </Provider>
-  </React.StrictMode>,
-  document.getElementById('root')
-);
-// ...
-
-// _reducer/index.js
-import { combineReducers } from 'redux';// 여러 Reducer를 하나로 합쳐줌
-import user from './user_reducer';
-//import commment from './commment_reducer';// 생성될 수도 있는 Reducer
-
-const rootReducer = combineReducers({
-  user
-})
-
-export default rootReducer;
-```
-- reducer 구현은 기능을 구현하면서 천천히 ...
+- Chrome의 Redux DevTools extension 설치
+- [소스코드(/src/index.js) 참고](/src/index.js)
+- [소스코드(/src/_reducerindex.js) 참고](/src/_reducer/index.js)
 - 읽을거리
 ```
 Redux는 state를 더욱 쉽게 관리할 수 있게 도와주는 역할을 합니다. 써도되고 안써도 됩니다. 
 Redux를 쓰면 성능 부분에서 느려지기 때문에 쓸 곳과 안 쓸 곳을 잘 가려서 쓰는게 중요합니다.
-
-우선 state은 그 현재 해당하는 페이지에서 어떠한 값들을 보여줘야 되잖아요  
-유저 정보를 나타내줘야 하는 페이지면 유저 이름, 유저 출신, 유저 아이디, 이메일 등등이 다 state이 됩니다.
-하지만 유저가 이 정보들을 바꿔주고 싶다면 이 state을 바꿔주어서 해당 페이지에서 보여주는 것도 바뀌게 됩니다.
-이게 부모 컴포넌트에서 전달되는 정보라면 props이 되고 하지만 props는 그 해당 컴포넌트에서는 바꿀 수가 없습니다.
-하지만 state은 해당 컴포넌트 안에서 값이 변화가 될 수 있습니다.
 ```
 
 ## 28장 React Hooks
 - React vs React Hooks
-- class Component vs functional Component
-- react Components는 두 가지 방식으로 구현될 수 있음
-  - class Component : 복잡, 다양, 느려짐
-  - functional Component : 한정적, 간결, 빨라짐, 단순, LifeCycle 함수를 사용할 수 없었음
+- [Class Component vs Functional Component](https://github.com/ChoSangmuk/react-class-vs-function-style)
+  - [GitHub Pages](https://chosangmuk.github.io/react-class-vs-function-style/)
+- React Components는 두 가지 방식으로 구현될 수 있음
+  - Class Component : 복잡, 다양, 느려짐
+  - Functional Component : 한정적, 간결, 빨라짐, 단순, (과거에는) LifeCycle 함수를 사용할 수 없었음
 ```js
 // Class Component
 import React, { Component } from 'react'
@@ -379,7 +322,7 @@ export default function Hello(){
   )
 }
 ```
-- React Hooks 발표 이후, 복잡한 기능도 functional Component 에서 사용 가능
+- React Hooks 발표 이후, 복잡한 기능도 Functional Component 에서 사용 가능
 ```js
 // Class Component
 import React, { Component } from 'react'
@@ -427,25 +370,16 @@ export default function Hello(){
 - [React LifeCycle](https://ko.reactjs.org/docs/react-component.html)
 
 ## 29장 로그인 페이지 (1)
-## 30장 로그인 페이지 (2)
 - Formik, yup 라이브러리로 다이나믹하게 효과를 줄 수 있음(but 이 강의에서는 진행하지 않음)
-- Redux를 사용하여 로그인 페이지에 작성
-- 입력 데이터를 서버로 보내고 응답받기
-```
-html value에 state를 매칭시켜줌
-onChange 메소드 실행 -> state 변경 -> value 변경 
-dispatch -> action -> reducer -> state
-```
+- Redux를 사용하여 간단하게 로그인 페이지에 작성
+  - html form input value와 State를 매칭시켜줌
+  - State 선언 시, useState Hook 사용
+  - 이벤트(onChange) 발생 시 해당 State 변경(useState의 2번째 함수(set_Name)를 사용)
 ```js
 // components/views/LoginPage/LoginPage.js
 import React, { useState } from 'react'
-import { useDispatch } from 'react-redux'
-import { loginUser } from '../../../_actions/user_action'
 
 function LoginPage(props) {
-  // dispatch를 통해 액션을 취함
-  const dispatch = useDispatch()
-
   // value - state 매칭
   // setEmail을 통해 state를 변경
   const [email, setEmail] = useState('example@email')
@@ -458,25 +392,6 @@ function LoginPage(props) {
 
   const onPasswordHandler = (event) => {
     setPassword(event.currentTarget.value)
-  }
-
-  const onSubmitHandler = (event) => {
-    event.preventDefault()
-
-    let body = {
-      email: email,
-      password: password
-    }
-
-    // dispatch(action)
-    dispatch(loginUser(body))
-      .then(Response => {
-        if (Response.payload.loginSuccess) {
-          props.history.push('/')
-        } else {
-          alert(Response.payload.message)
-        }
-      })
   }
 
   return (
@@ -493,8 +408,17 @@ function LoginPage(props) {
   )
 }
 
-export default LoginPage
+export default LoginPage;
 ```
+
+## 30장 로그인 페이지 (2)
+- 제출 이벤트(onSubmit), onSubmitHandler 구현
+- Form의 onSubmit 기본 기능을 막기 위해 preventDefault 사용
+- 입력된 데이터(value, State)를 서버로 보내고 응답받기
+  - 원래는 Axios.post를 사용, 특정 URL에 데이터를 보내줌
+  - Redux를 사용하여 dispatch -> action -> reducer -> store 순으로 데이터를 전달할 예정
+  - 우선 dispatch 만들기
+- [소스코드(LoginPage.js) 참고](/src/components/views/LoginPage/LoginPage.js)
 
 ## 31장 회원 가입 페이지
 - 로그인 페이지와 유사

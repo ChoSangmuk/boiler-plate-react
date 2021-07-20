@@ -4,6 +4,7 @@ import user from './user_reducer';
 
 const rootReducer = combineReducers({
   user
+  // commment
 })
 
 export default rootReducer;
